@@ -21,7 +21,7 @@ export class FormModal extends FormLead {
     render(){
         this.state?.id!=undefined?this.state.form.id = `${this.state.id}-form`:`form-${Math.floor(Math.random() * 100)}`;
         this.innerHTML =  /* html */`
-        <div class="modal is-active">
+        <div class="modal">
             <div class="modal-background"></div>
             <div class="modal-card">
                 ${this.state.title?.text[this.state.context.lang]!=undefined?`
