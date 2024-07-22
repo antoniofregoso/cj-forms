@@ -1,6 +1,19 @@
 
 import countryCodes from "./countryCodes.json";
 
+
+export function addFormEvents(component){
+    let btnCancel = component.querySelector("#cancel-lead");
+    let form = component.querySelector("form");
+    let email = component.querySelector("#email");
+    let phone = component.querySelector("#phone");
+    if (btnCancel!=null){btnCancel.addEventListener("click",component)};
+    if (form!=null){form.addEventListener("submit",component)};
+    if (email!=null){email.addEventListener("change",component)};
+    if (phone!=null){phone.addEventListener("change",component)};
+}
+
+
 export class BjForm {
 
     #default = {
@@ -9,6 +22,11 @@ export class BjForm {
                 es:"Nombre",
                 en:"Name",
                 fr:"Nom"
+            },
+            help:{
+                es:"El campo Nombre es obligatorio.",
+                en:"The Name field is required.",
+                fr:"Il est requis de compléter le champ correspondant au nom."
             }
         },
         function:{
@@ -16,6 +34,11 @@ export class BjForm {
                 es:"Puesto de Trabajo",
                 en:"Job Position",
                 fr:"Poste"
+            },
+            help:{
+                es:"El campo Puesto de Trabajo es obligatorio.",
+                en:"The Job Position field is required.",
+                fr:"Le champ Poste est obligatoire."
             }
         },
         email:{
@@ -25,6 +48,11 @@ export class BjForm {
                 fr:"e-mail"
             },
         help:{
+            es:"El campo Correo Electrónico es obligatorio.",
+            en:"The Email field is required.",
+            fr:"Le champ E-mail est obligatoire."
+        },
+        help2:{
             es:"El correo electrónico es invalido.",
             en:"Email is invalid.",
             fr:"Le courriel est invalide."
@@ -37,9 +65,14 @@ export class BjForm {
                 fr:"Téléphone"
             },
             help:{
-                es:"Este número telefónico no es válido.",
-                en:"This telephone number is not valid.",
-                fr:"Ce numéro de téléphone est invalide."
+                es:"El campo Teléfono es obligatorio.",
+                en:"The Telephone field is required.",
+                fr:"Le champ Téléphone est obligatoire."
+            },
+            help2:{
+                es:"El Número Telefónico es inválido.",
+                en:"The Telephone Number is invalid.",
+                fr:"Le numéro de téléphone n'est pas valide."
             }
         },
         company:{
@@ -47,6 +80,11 @@ export class BjForm {
                 es:"Compañía",
                 en:"Company",
                 fr:"Entreprise"
+            },
+            help:{
+                es:"El campo Compañia es obligatorio.",
+                en:"The Company field is required.",
+                fr:"Le champ Société est obligatoire."
             }
         },
         subject:{
@@ -54,6 +92,11 @@ export class BjForm {
                 es:"Asunto",
                 en:"Subject",
                 fr:"Objet"
+            },
+            help:{
+                es:"El campo Asunto es obligatorio.",
+                en:"The Subject field is required.",
+                fr:"Le champ Objet est obligatoire."
             }
         },
         description:{
@@ -61,6 +104,11 @@ export class BjForm {
                 es:"Descripción",
                 en:"Description",
                 fr:"Description"
+            },
+            help:{
+                es:"El campo Descripción es obligatorio.",
+                en:"The Description field is required.",
+                fr:"Le champ Description est obligatoire."
             }
         },
         terms:{
@@ -68,6 +116,11 @@ export class BjForm {
                 es:"Estoy de acuerdo con los",
                 en:"I agree to the",
                 fr:"J'accepte les"
+            },
+            help:{
+                es:"Tienes que aceptar los Términos y Condiciones.",
+                en:"You have to accept the Terms and Conditions.",
+                fr:"Vous devez accepter les termes et conditions."
             },
         required:true
         },
@@ -176,16 +229,18 @@ export class BjForm {
         }
         return values
     }
+    
 
     render(){
         return  `
-        <form id="${this.state.id}" ${this.getClasses(["box"], this.state.form?.box?.classList)} novalidate>
+        <form id="${this.state.id}" ${this.getClasses(["box"], this.state.form?.box?.classList)}  ${this.setAnimation(this.state.form?.animation)} novalidate>
                 ${this.state.name?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.name?.animation)}>
                         <label class="label">${this.state.name?.label[this.state.context.lang]}</label>
                         <div class="control">
                         <input id="contact" class="input" type="text" ${this.state.name?.placeholder!=undefined?`placeholder="${this.state.name.placeholder[this.state.context.lang]}"`:``}  ${this.state.name?.required===true?'required':''}>
                         </div>
+                        <p class="help is-danger is-hidden" id="help-contact">${this.state.name?.help[this.state.context.lang]}</p>
                     </div>`:''}
                     ${this.state.function?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.function?.animation)}>
@@ -193,6 +248,7 @@ export class BjForm {
                         <div class="control">
                         <input id="function" class="input" type="text" ${this.state.function?.placeholder!=undefined?`placeholder="${this.state.function.placeholder[this.state.context.lang]}"`:``}  ${this.state.function?.required===true?'required':''}>
                         </div>
+                        <p class="help is-danger is-hidden" id="help-function">${this.state.function?.help[this.state.context.lang]}</p>
                     </div>`:''}
                     ${this.state.email?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.email?.animation)}>
@@ -201,6 +257,7 @@ export class BjForm {
                         <input id="email" class="input" type="text" ${this.state.email?.placeholder!=undefined?`placeholder="${this.state.email.placeholder[this.state.context.lang]}"`:``}   ${this.state.email?.required===true?'required':''}>
                         </div>
                         <p class="help is-danger is-hidden" id="help-email">${this.state.email?.help[this.state.context.lang]}</p>
+                        <p class="help is-danger is-hidden" id="help2-email">${this.state.email?.help2[this.state.context.lang]}</p>
                     </div>`:''}
                     ${this.state.phone?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.phone?.animation)}>
@@ -218,6 +275,7 @@ export class BjForm {
                             </div>
                         </div>
                         <p class="help is-danger is-hidden" id="help-phone">${this.state.phone?.help[this.state.context.lang]}</p>
+                        <p class="help is-danger is-hidden" id="help2-phone">${this.state.phone?.help2[this.state.context.lang]}</p>
                     </div>`:''}
                     ${this.state.company?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.company.animation)}>
@@ -225,6 +283,7 @@ export class BjForm {
                         <div class="control">
                         <input id="company" class="input" type="text" ${this.state.company?.placeholder!=undefined?`placeholder="${this.state.company.placeholder[this.state.context.lang]}"`:``}  ${this.state.company?.required===true?'required':''}>
                         </div>
+                        <p class="help is-danger is-hidden" id="help-company">${this.state.company?.help[this.state.context.lang]}</p>
                     </div>`:''}
                     ${this.state.subject?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.subject.animation)}>
@@ -232,6 +291,7 @@ export class BjForm {
                         <div class="control">
                         <input id="subject" class="input" type="text" ${this.state.subject?.placeholder!=undefined?`placeholder="${this.state.subject.placeholder[this.state.context.lang]}"`:``}  ${this.state.subject?.required===true?'required':''}>
                         </div>
+                        <p class="help is-danger is-hidden" id="help-subject">${this.state.subject?.help[this.state.context.lang]}</p>
                     </div>`:''}
                     ${this.state.description?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.description.animation)}>
@@ -239,6 +299,7 @@ export class BjForm {
                         <div class="control">
                             <textarea id="description" class="textarea has-fixed-size" ${this.state.description?.placeholder!=undefined?`placeholder="${this.state.description.placeholder[this.state.context.lang]}"`:``} ${this.state.description?.required===true?'required':''}></textarea>
                         </div>
+                        <p class="help is-danger is-hidden" id="help-description">${this.state.description?.help[this.state.context.lang]}</p>
                     </div>`:''}
                     ${this.state.terms?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.terms.animation)}>
@@ -248,6 +309,7 @@ export class BjForm {
                             ${this.state.terms?.text[this.state.context.lang]} <a href="${this.state.termsLink?.url!=undefined?this.state.termsLink?.url:'#'}">${this.state.termsLink?.text[this.state.context.lang]}</a>
                             </label>
                         </div>
+                        <p class="help is-danger is-hidden" id="help-terms">${this.state.terms?.help[this.state.context.lang]}</p>
                     </div>`:''}
                     <div class="field is-grouped">
                         <div class="control" ${this.setAnimation(this.state.submit?.animation)}>

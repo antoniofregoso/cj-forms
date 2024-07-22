@@ -1,5 +1,5 @@
 import { AppElement } from "@buyerjourney/bj-core";
-import { BjForm } from "./Form";
+import { BjForm, addFormEvents } from "./Form";
 import {isValidPhoneNumber } from "libphonenumber-js";
 import countryCodes from "./countryCodes.json";
 
@@ -7,7 +7,6 @@ export class FormLead extends AppElement {
 
     
     #default = {
-        eventName:"user:click-form-lead",
         form:{}
     }
 
@@ -16,9 +15,7 @@ export class FormLead extends AppElement {
         this.eventName = "user:click-form-lead";
         this.state =this.initState(this.#default,props);
         this.getAttribute("id")||this.setAttribute("id",this.state.id||`component-${Math.floor(Math.random() * 100)}`);
-        this.setAttribute("stage","awaiting")
-        this.validationEmail = false;
-        this.validationPhone = false;
+        this.ok = false;
        
     }
 
@@ -29,7 +26,6 @@ export class FormLead extends AppElement {
 
 
     handleEvent(event) {
-        console.log(event)
         let leadForm = this.querySelector("form")
         if (event.type === "click"&&event.target.id==='cancel-lead'){
             const lead = new CustomEvent(this.state.eventName,{
@@ -45,19 +41,21 @@ export class FormLead extends AppElement {
             let phone = code + ' ' + event.target.value;
             if (isValidPhoneNumber(phone, country.code)){
                 this.querySelector("#help-phone").classList.add("is-hidden");
-                this.validationPhone = true;
+                this.querySelector("#help2-phone").classList.add("is-hidden");
+                this.ok = true;
             } else {
-                this.querySelector("#help-phone").classList.remove("is-hidden");
-                this.validationPhone = false;
+                this.querySelector("#help2-phone").classList.remove("is-hidden");
+                this.ok = false;
             }
         }else if (event.type === "change"&&event.target.id==='email'){
             let regex = /^(?!\.)((?!.*\.{2})[a-zA-Z0-9\u00E0-\u00FC.!#$%&'*+-/=?^_`{|}~\-\d]+)@(?!\.)([a-zA-Z0-9\u00E0-\u00FC\-\.\d]+)((\.([a-zA-Z]){2,63})+)$/;
-            if (regex.test(event.target.value)){                
+            if (regex.test(event.target.value)){ 
                 this.querySelector("#help-email").classList.add("is-hidden");
-                this.validationEmail = true;
+                this.querySelector("#help2-email").classList.add("is-hidden");
+                this.ok = true;
             }else {
-                this.querySelector("#help-email").classList.remove("is-hidden");
-                this.validationEmail = false;
+                this.querySelector("#help2-email").classList.remove("is-hidden");
+                this.ok = false;
             }
         }else if (event.type === "click"&&event.target.id==='cancel-lead'){
                 event.preventDefault();
@@ -69,7 +67,74 @@ export class FormLead extends AppElement {
             this.dispatchEvent(cancelLead);
         }else if (event.type === "submit"){
             event.preventDefault();
-            if (this.validationEmail===true&&this.validationPhone===true){
+            let contact = this.querySelector("#contact");
+            let position = this.querySelector("#function");
+            let phone = this.querySelector("#phone");
+            let email = this.querySelector("#email");
+            let company = this.querySelector("#company");
+            let subject = this.querySelector("#subject");
+            let description = this.querySelector("#description");
+            let terms = this.querySelector("#terms");
+            if (contact!=null&&contact.required&&contact.value.trim() === ''){
+                this.querySelector("#help-contact").classList.remove("is-hidden");
+                this.ok = false;
+            }else if (contact!=null){
+                this.querySelector("#help-contact").classList.add("is-hidden");
+                this.ok = true;
+            }
+            if (position!=null&&position.required&&position.value.trim() === ''){
+                this.querySelector("#help-function").classList.remove("is-hidden");
+                this.ok = false;
+            }else if (position!=null){
+                this.querySelector("#help-function").classList.add("is-hidden");
+                this.ok = true;
+            }
+            if (company!=null&&company.required&&company.value.trim() === ''){
+                this.querySelector("#help-company").classList.remove("is-hidden");
+                this.ok = false;
+            }else if (company!=null){
+                this.querySelector("#help-company").classList.add("is-hidden");
+                this.ok = true;
+            }
+            if (phone!=null&&phone.required&&phone.value.trim() === ''){
+                this.querySelector("#help-phone").classList.remove("is-hidden");
+                this.ok = false;
+            }else if (phone!=null){
+                this.querySelector("#help-phone").classList.add("is-hidden");
+                this.ok = true;
+            }
+            if (email!=null&&email.required&&email.value.trim() === ''){
+                this.querySelector("#help-email").classList.remove("is-hidden");
+                this.ok = false;
+            }else if (email!=null){
+                this.querySelector("#help-email").classList.add("is-hidden");
+                this.ok = true;
+            }
+            if (subject!=null&&subject.required&&subject.value.trim() === ''){
+                this.querySelector("#help-subject").classList.remove("is-hidden");
+                this.ok = false;
+            }else if (subject!=null){
+                this.querySelector("#help-subject").classList.add("is-hidden");
+                this.ok = true;
+            }
+            if (description!=null&&description.required&&description.value.trim() === ''){
+                this.querySelector("#help-description").classList.remove("is-hidden");
+                this.ok = false;
+            }else if (description!=null){
+                this.querySelector("#help-description").classList.add("is-hidden");
+                this.ok = true;
+            }
+            if (terms!=null&&terms.required&&terms.checked==false){
+                this.querySelector("#help-terms").classList.remove("is-hidden");
+                this.ok = false;
+            }else if (terms!=null){
+                this.querySelector("#help-terms").classList.add("is-hidden");
+                this.ok = true;
+            }
+            if (this.ok===true){
+                if(this.form?.eventName!=undefined){
+                    this.eventName = this.state.form.eventName             
+                  }
                 let data = {}
                 if (leadForm?.contact!=undefined){
                     data['name'] = leadForm.contact.value;
@@ -92,7 +157,7 @@ export class FormLead extends AppElement {
                 if (leadForm?.description!=undefined){
                     data['description'] = leadForm.description.value;
                 }
-                const lead = new CustomEvent(this.state.eventName,{
+                const lead = new CustomEvent(this.eventName,{
                     detail:{click:event.target.id, lead:data},
                     bubbles: true,
                     composed: true
@@ -106,26 +171,12 @@ export class FormLead extends AppElement {
 
   
    
-      addEvents(){
-        let btnCancel = this.querySelector("#cancel-lead");
-        let form = this.querySelector("form");
-        let email = this.querySelector("#email");
-        let phone = this.querySelector("#phone");
-        let contact = this.querySelector("#contact");
-        let position = this.querySelector("#function");
-        let company = this.querySelector("#company");
-        let subject = this.querySelector("#subject");
-        let description = this.querySelector("#description");
-        let terms = this.querySelector("#terms");
-        btnCancel.addEventListener("click",this);
-        form.addEventListener("submit",this);
-        email.addEventListener("change",this)
-        phone.addEventListener("change",this)
-    }
+    
+
     render(){
         this.state?.id!=undefined?this.state.form.id = `${this.state.id}-form`:`form-${Math.floor(Math.random() * 100)}`;
         this.innerHTML =  /* html */`
-        <section ${this.getClasses(["section"], this.state?.classList)} ${this.setAnimation(this.state.animation)}>
+        <section ${this.getClasses(["section"], this.state?.classList)} ${this.setAnimation(this.state.animation)} ${this.getBackground()}>
             <div class="container py-4">
                 ${this.getTitles()}
                 <div class="columns is-centered">
@@ -136,9 +187,9 @@ export class FormLead extends AppElement {
             </div>
         </section>
         `
-        this.addEvents()
+        addFormEvents(this);
     }
 
 }
 
-customElements.define("form-lead", FormLead)
+customElements.define("form-lead", FormLead);
