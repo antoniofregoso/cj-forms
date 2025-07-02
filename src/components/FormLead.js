@@ -1,5 +1,5 @@
-import { AppElement } from "@buyerjourney/bj-core";
-import { BjForm, addFormEvents } from "./Form";
+import { AppElement } from "@customerjourney/cj-core";
+import { CjForm, addFormEvents } from "./Form";
 import {isValidPhoneNumber } from "libphonenumber-js";
 import countryCodes from "./countryCodes.json";
 
@@ -22,8 +22,6 @@ export class FormLead extends AppElement {
     static get observedAttributes() {
         return ["stage"];
       }
-
-
 
     handleEvent(event) {
         let leadForm = this.querySelector("form")
@@ -181,7 +179,7 @@ export class FormLead extends AppElement {
                 ${this.getTitles()}
                 <div class="columns is-centered">
                     <div class="column ${this.state?.size!=undefined?this.state.size:'is-4'}">
-                       ${this.state?.form!=undefined?new BjForm(this.state.form, this.state.context).render():''}
+                       ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import { FormLead } from "./FormLead";
-import { BjForm, addFormEvents } from "./Form";
+import { CjForm, addFormEvents } from "./Form";
 import { Remarkable } from "remarkable";
 
 export class FormHero extends FormLead  {
@@ -28,7 +28,7 @@ export class FormHero extends FormLead  {
         this.state?.id!=undefined?this.state.form.id = `${this.state.id}-form`:`form-${Math.floor(Math.random() * 100)}`;
         let form = /* html */`
             <div  ${this.getClasses(["column", "p-6"], [this.state.formWidth])}>
-                ${this.state?.form!=undefined?new BjForm(this.state.form, this.state.context).render():''}
+                ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
             </div>
         `;
         let text = /* html */`  

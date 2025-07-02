@@ -14,7 +14,7 @@ export function addFormEvents(component){
 }
 
 
-export class BjForm {
+export class CjForm {
 
     #default = {
         name:{

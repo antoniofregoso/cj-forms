@@ -1,11 +1,28 @@
 import { FormLead } from "./FormLead";
 import { CjForm, addFormEvents } from "./Form";
+import { Calendar } from 'vanilla-calendar-pro';
+import 'vanilla-calendar-pro/styles/index.css';
+import 'vanilla-calendar-pro/styles/themes/light.css';
+import 'vanilla-calendar-pro/styles/themes/dark.css';
 
-export class FormModal extends FormLead {
+export class FormAppoinment extends FormLead {
 
     #default = {
         eventName:"user:click-form-modal",
-        form:{}
+        form:{
+            function:{
+                disabled:true
+            },
+            company:{
+                disabled:true
+            },
+            subject:{
+                disabled:true
+            },
+            description:{
+                disabled:true
+            }
+        }
     }
 
     constructor(props={}){
@@ -15,7 +32,16 @@ export class FormModal extends FormLead {
         this.getAttribute("id")||this.setAttribute("id",this.state.id||`component-${Math.floor(Math.random() * 100)}`);
         this.setAttribute("stage","awaiting")
         this.ok = false;
-       
+    }
+
+     attributeChangedCallback(name, oldValue, newValue) {
+        switch (newValue){
+            case 'open':
+                const calendar = new Calendar('#calendar');
+                calendar.init()
+                this.querySelector('.modal').classList.toggle('is-active');
+                break;
+        }
     }
 
     render(){
@@ -29,7 +55,14 @@ export class FormModal extends FormLead {
                     <p class="modal-card-title">${this.state.title.text[this.state.context.lang]}</p>
                 </header>`:''}
                 <section class="modal-card-body">
-                     ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
+                        <div>
+                            <div id="calendar"></div>
+                        </div>
+                        <div class="pt-2">
+                        </div>
+                        <div class="pt-2">
+                            ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
+                        </div>
                 </section>
             </div>
         /div>
@@ -39,4 +72,4 @@ export class FormModal extends FormLead {
 
 }
 
-customElements.define("form-modal", FormModal);
+customElements.define("form-appoinment", FormAppoinment);
