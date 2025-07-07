@@ -8,7 +8,7 @@ import 'vanilla-calendar-pro/styles/themes/dark.css';
 export class FormAppoinment extends FormLead {
 
     #default = {
-        eventName:"user:click-form-modal",
+        eventName:"user:click-form-appoinment",
         form:{
             function:{
                 disabled:true
@@ -23,7 +23,7 @@ export class FormAppoinment extends FormLead {
                 disabled:true
             }
         },
-        appoinment:{
+        calendar:{
             initialTime:9,
             finalTime:17,
             deltaTime:60
@@ -32,29 +32,72 @@ export class FormAppoinment extends FormLead {
 
     constructor(props={}){
         super();
-        this.eventName = "user:click-form-modal";
         this.state =this.initState(this.#default,props);
         this.getAttribute("id")||this.setAttribute("id",this.state.id||`component-${Math.floor(Math.random() * 100)}`);
         this.setAttribute("stage","awaiting")
         this.ok = false;
+        this.calendar = false;
     }
 
      attributeChangedCallback(name, oldValue, newValue) {
-        switch (newValue){
-            case 'open':
-                const calendar = new Calendar('#calendar',{
-                    locale: this.state.context.lang,
-                    onClickDate(self, event) {
-                        let selection = event.target.parentNode;
-                        let date = selection.dataset.vcDate;
-                        const [year, month, day] = fecha.split('-');
-                        console.log(selection.dataset.vcDate)
-                    },
-                    });
-                calendar.init();
-                this.querySelector('.modal').classList.toggle('is-active');
-                break;
+        if (newValue === 'open'){
+            if (this.calendar===false){
+                this.calendar = new Calendar('#calendar',this.#setCalendar());
+                this.calendar.init();
+            }else {
+                this.calendar.update();
+            }
+            let form = this.querySelector("form");
+            const fieldset = form.querySelector('fieldset');
+            fieldset.disabled = true;
+            this.querySelector('.modal').classList.add('is-active');            
+        }else {
+            this.querySelector('form').reset();
+            let times = this.querySelector('.grid').querySelectorAll('button:not([disabled])');
+            times.forEach((time)=>{
+                if (time.classList.contains('is-info')){
+                    time.classList.remove('is-info');
+                }
+                time.disabled = true;
+            })          
+
+            this.querySelector('.modal').classList.remove('is-active');
         }
+    }
+
+    #setCalendar() {
+        let today = new Date();
+        let config = {
+                locale: this.state.context.lang,
+                onClickDate(self, event) {
+                    let selection = event.target.parentNode;
+                    let date = selection.dataset.vcDate;
+                    const customEvent = new CustomEvent('date-selected',{
+                        detail:{date:date},
+                        bubbles: true,
+                        composed: true
+                    });
+                    selection.dispatchEvent(customEvent);
+                    },
+                }
+        if (this.state.calendar?.disablePastDays===true){
+            let yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            config.displayDateMin = `${yyyy}-${mm}-${dd}`; 
+        }
+        if (this.state.calendar?.deltaDays>0){
+            today.setDate(today.getDate() + this.state.calendar.deltaDays -1);
+            let yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            config.displayDateMax = `${yyyy}-${mm}-${dd}`;
+        }
+        if(this.state.calendar?.availableDates!=undefined){
+            config.disableAllDates = true,
+            config.enableDates = this.state.calendar.availableDates;
+        }
+        return config;
     }
 
     #pad(num) {
@@ -63,9 +106,9 @@ export class FormAppoinment extends FormLead {
 
     #getTimes(){
         let times = '';
-        let deltaTime = this.state.appoinment.deltaTime;
-        let currentMinutes = this.state.appoinment.initialTime * 60;
-        const endMinutes = this.state.appoinment.finalTime * 60 + deltaTime;
+        let deltaTime = this.state.calendar.deltaTime;
+        let currentMinutes = this.state.calendar.initialTime * 60;
+        const endMinutes = this.state.calendar.finalTime * 60 + deltaTime;
         if (currentMinutes<endMinutes){
             while (currentMinutes <= endMinutes) {
                 const hours = Math.floor(currentMinutes / 60);
@@ -80,12 +123,56 @@ export class FormAppoinment extends FormLead {
         return times
     }
 
-    addTimeEvents(){
-        let options = this.querySelectorAll('.is-time');
-        for (let opt in options){
-            
-           console.log(opt)
-        }
+    enableTimes(options){
+        options.forEach(time => {
+            let el = this.querySelector(`[data-time="${time}"]`);
+            if (el){
+                el.removeAttribute("disabled");
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const customEvent = new CustomEvent('time-selected',{
+                        detail:{time:time},
+                        bubbles: false,
+                        composed: true
+                    });
+                    this.dispatchEvent(customEvent);
+                });
+            }else{
+                console.warn(`Time ${time} not found in the form appoinment component.`);
+            }
+        })
+    }
+
+  
+
+   registerExtraEvents(){
+        this.addEventListener('time-selected', (e) => {
+            const dateSelected = this.querySelector('.vc-dates button[aria-selected="true"]').parentNode.dataset.vcDate;
+            let appoinmentDate = `${dateSelected} ${e.detail.time}`;
+            let options = this.querySelectorAll('.is-time');
+            options.forEach(el => {
+                el.classList.remove('is-info');
+            });
+            this.querySelector(`[data-time="${e.detail.time}"]`).classList.add('is-info');
+            let form = this.querySelector("form");
+            const fieldset = form.querySelector('fieldset');
+            fieldset.disabled = false;
+            let input = this.querySelector("#appoinment");
+            if (input){
+                input.value = appoinmentDate;
+            }
+        })
+   }
+
+    addDateField(){
+        var input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("id", "appoinment");
+        let form = this.querySelector("form");
+        form.classList.remove("box");
+        const fieldset = form.querySelector('fieldset');
+        fieldset.appendChild(input);
     }
 
     render(){
@@ -103,20 +190,22 @@ export class FormAppoinment extends FormLead {
                             <div id="calendar"></div>
                         </div>
                         <div class="pt-2">
-                            <div class="fixed-grid has-6-cols">
+                            <div class="fixed-grid has-5-cols">
                                 <div class="grid">
                                     ${this.#getTimes()}
                                 </div>
                             </div>
                         </div>
-                        <div class="pt-2">
+                        <div class="pt-4">
                             ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
                         </div>
                 </section>
             </div>
-        /div>
+        </div>
         `
         addFormEvents(this);
+        this.registerExtraEvents();
+        this.addDateField()
     }
 
 }

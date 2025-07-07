@@ -155,7 +155,13 @@ export class FormLead extends AppElement {
                 if (leadForm?.description!=undefined){
                     data['description'] = leadForm.description.value;
                 }
-                const lead = new CustomEvent(this.eventName,{
+                const hiddenInputs = leadForm.querySelectorAll('input[type="hidden"]');
+                if (hiddenInputs.length > 0) {
+                    hiddenInputs.forEach(input => {
+                        data[input.id] = input.value;
+                    });
+                }
+                const lead = new CustomEvent(this.state.eventName,{
                     detail:{click:event.target.id, lead:data},
                     bubbles: true,
                     composed: true

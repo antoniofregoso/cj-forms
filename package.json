@@ -1,7 +1,7 @@
 {
-  "name": "@buyerjourney/bj-forms",
-  "version": "0.9.0",
-  "description": "",
+  "name": "@customerjourney/cj-forms",
+  "version": "0.10.0",
+  "description": "Macro-components for creating forms",
   "main": "src/index.js",
   "module": "src/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antoniofregoso/bj-forms.git"
+    "url": "git+https://github.com/antoniofregoso/cj-forms.git"
   },
   "author": "Antonio Fregoso <antoniofregoso@protonmail.com>",
   "license": "GPL-3.0-or-later",
@@ -19,15 +19,15 @@
     "esbuild": "^0.19.4"
   },
   "dependencies": {
-    "@buyerjourney/bj-core": "^1.3.0",
+    "@customerjourney/cj-core": "^1.3.0",
     "libphonenumber-js": "^1.11.4",
     "remarkable": "^2.0.1",
     "vanilla-calendar-pro": "^3.0.4"
   },
   "bugs": {
-    "url": "https://github.com/antoniofregoso/bj-forms/issues"
+    "url": "https://github.com/antoniofregoso/cj-forms/issues"
   },
-  "homepage": "https://buyerjourney.ninja/forms",
+  "homepage": "https://customerjourney.ninja/documentation/forms/",
   "keywords": [
     "vanilla-javascript",
     "components",

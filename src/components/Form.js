@@ -217,7 +217,7 @@ export class CjForm {
         let values = ``;
         if (this.state.phoneCodes===undefined){
             countryCodes.codes.forEach(country=>{
-                values += `<option value="${country.dial_code}">${this.#getFlagEmoji(country.code)}</option>`
+                values += `<option value="${country.dial_code}" ${this.state.code===country.code?'selected':''}>${this.#getFlagEmoji(country.code)}</option>`
             })
         } else{
             if (this.state.phoneCodes.length>0){
@@ -233,12 +233,13 @@ export class CjForm {
 
     render(){
         return  `
-        <form id="${this.state.id}" ${this.getClasses(["box"], this.state.form?.box?.classList)}  ${this.setAnimation(this.state.form?.animation)} novalidate>
+        <form id="${this.state.id}" ${this.getClasses(["box"], this.state?.classList)}  ${this.setAnimation(this.state.form?.animation)} novalidate>
+            <fieldset>
                 ${this.state.name?.disabled!=true?`
                     <div class="field" ${this.setAnimation(this.state.name?.animation)}>
                         <label class="label">${this.state.name?.label[this.state.context.lang]}</label>
                         <div class="control">
-                        <input id="contact" class="input" type="text" ${this.state.name?.placeholder!=undefined?`placeholder="${this.state.name.placeholder[this.state.context.lang]}"`:``}  ${this.state.name?.required===true?'required':''}>
+                        <input id="contact" class="input" type="text" ${this.state.name?.placeholder!=undefined?`placeholder="${this.state.name.placeholder[this.state.context.lang]}"`:``}  ${this.state.name?.required===true?'required':''} >
                         </div>
                         <p class="help is-danger is-hidden" id="help-contact">${this.state.name?.help[this.state.context.lang]}</p>
                     </div>`:''}
@@ -313,12 +314,13 @@ export class CjForm {
                     </div>`:''}
                     <div class="field is-grouped">
                         <div class="control" ${this.setAnimation(this.state.submit?.animation)}>
-                            <button  id="submit-lead" ${this.getClasses(["button"], this.state.submit?.classList)}>${this.state.submit?.text[this.state.context.lang]}</button>
+                            <button type="submit" id="submit-lead" ${this.getClasses(["button"], this.state.submit?.classList)}>${this.state.submit?.text[this.state.context.lang]}</button>
                         </div>
                         <div class="control" ${this.setAnimation(this.state.cancel?.animation)}>
-                            <button  id="cancel-lead" ${this.getClasses(["button"], this.state.cancel?.classList)}>${this.state.cancel?.text[this.state.context.lang]}</button>
+                            <button type="button" id="cancel-lead" ${this.getClasses(["button"], this.state.cancel?.classList)}>${this.state.cancel?.text[this.state.context.lang]}</button>
                         </div>
                     </div>
+                    </fieldset>
                 </form>        
         `;
     }
