@@ -27,7 +27,7 @@ export class FormLead extends AppElement {
         let leadForm = this.querySelector("form")
         if (event.type === "click"&&event.target.id==='cancel-lead'){
             const lead = new CustomEvent(this.state.eventName,{
-                detail:{click:event.target.id},
+                detail:{source:event.target.id},
                 bubbles: true,
                 composed: true
             });
@@ -162,7 +162,7 @@ export class FormLead extends AppElement {
                     });
                 }
                 const lead = new CustomEvent(this.state.eventName,{
-                    detail:{click:event.target.id, lead:data},
+                    detail:{source:event.target.id, lead:data},
                     bubbles: true,
                     composed: true
                 });

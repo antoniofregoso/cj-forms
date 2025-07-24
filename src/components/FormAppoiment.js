@@ -66,14 +66,16 @@ export class FormAppoinment extends FormLead {
     }
 
     #setCalendar() {
+        let eventName = this.state.eventName;
+        let id = this.state.id;
         let today = new Date();
         let config = {
                 locale: this.state.context.lang,
                 onClickDate(self, event) {
                     let selection = event.target.parentNode;
                     let date = selection.dataset.vcDate;
-                    const customEvent = new CustomEvent('date-selected',{
-                        detail:{date:date},
+                    const customEvent = new CustomEvent(eventName,{
+                        detail:{source:`${id}-calendar`, date:date},
                         bubbles: true,
                         composed: true
                     });
@@ -176,36 +178,38 @@ export class FormAppoinment extends FormLead {
     }
 
     render(){
-        this.state?.id!=undefined?this.state.form.id = `${this.state.id}-form`:`form-${Math.floor(Math.random() * 100)}`;
-        this.innerHTML =  /* html */`
-        <div class="modal">
-            <div class="modal-background"></div>
-            <div class="modal-card">
-                ${this.state.title?.text[this.state.context.lang]!=undefined?`
-                <header ${this.getClasses(["modal-card-head"], this.state.title?.classList)}  ${this.setAnimation(this.state.title?.animation)}>
-                    <p class="modal-card-title">${this.state.title.text[this.state.context.lang]}</p>
-                </header>`:''}
-                <section class="modal-card-body">
-                        <div>
-                            <div id="calendar"></div>
-                        </div>
-                        <div class="pt-2">
-                            <div class="fixed-grid has-5-cols">
-                                <div class="grid">
-                                    ${this.#getTimes()}
+        //if (this.state.context!== undefined && this.state.context.lang!=undefined){
+            this.state?.id!=undefined?this.state.form.id = `${this.state.id}-form`:`form-${Math.floor(Math.random() * 100)}`;
+            this.innerHTML =  /* html */`
+            <div class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    ${this.state.title?.text[this.state.context.lang]!=undefined?`
+                    <header ${this.getClasses(["modal-card-head"], this.state.title?.classList)}  ${this.setAnimation(this.state.title?.animation)}>
+                        <p class="modal-card-title">${this.state.title.text[this.state.context.lang]}</p>
+                    </header>`:''}
+                    <section class="modal-card-body">
+                            <div>
+                                <div id="calendar"></div>
+                            </div>
+                            <div class="pt-2">
+                                <div class="fixed-grid has-5-cols">
+                                    <div class="grid">
+                                        ${this.#getTimes()}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="pt-4">
-                            ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
-                        </div>
-                </section>
+                            <div class="pt-4">
+                                ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
+                            </div>
+                    </section>
+                </div>
             </div>
-        </div>
-        `
-        addFormEvents(this);
-        this.registerExtraEvents();
-        this.addDateField()
+            `
+            addFormEvents(this);
+            this.registerExtraEvents();
+            this.addDateField()
+            //}
     }
 
 }
