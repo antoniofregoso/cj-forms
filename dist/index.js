@@ -7384,7 +7384,7 @@
       let leadForm = this.querySelector("form");
       if (event.type === "click" && event.target.id === "cancel-lead") {
         const lead = new CustomEvent(this.state.eventName, {
-          detail: { click: event.target.id },
+          detail: { source: event.target.id },
           bubbles: true,
           composed: true
         });
@@ -7518,7 +7518,7 @@
             });
           }
           const lead = new CustomEvent(this.state.eventName, {
-            detail: { click: event.target.id, lead: data },
+            detail: { source: event.target.id, lead: data },
             bubbles: true,
             composed: true
           });
@@ -12366,14 +12366,16 @@
       }
     }
     #setCalendar() {
+      let eventName = this.state.eventName;
+      let id = this.state.id;
       let today = /* @__PURE__ */ new Date();
       let config3 = {
         locale: this.state.context.lang,
         onClickDate(self, event) {
           let selection = event.target.parentNode;
           let date = selection.dataset.vcDate;
-          const customEvent = new CustomEvent("date-selected", {
-            detail: { date },
+          const customEvent = new CustomEvent(eventName, {
+            detail: { source: `${id}-calendar`, date },
             bubbles: true,
             composed: true
           });
@@ -12470,31 +12472,31 @@
       this.state?.id != void 0 ? this.state.form.id = `${this.state.id}-form` : `form-${Math.floor(Math.random() * 100)}`;
       this.innerHTML = /* html */
       `
-        <div class="modal">
-            <div class="modal-background"></div>
-            <div class="modal-card">
-                ${this.state.title?.text[this.state.context.lang] != void 0 ? `
-                <header ${this.getClasses(["modal-card-head"], this.state.title?.classList)}  ${this.setAnimation(this.state.title?.animation)}>
-                    <p class="modal-card-title">${this.state.title.text[this.state.context.lang]}</p>
-                </header>` : ""}
-                <section class="modal-card-body">
-                        <div>
-                            <div id="calendar"></div>
-                        </div>
-                        <div class="pt-2">
-                            <div class="fixed-grid has-5-cols">
-                                <div class="grid">
-                                    ${this.#getTimes()}
+            <div class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    ${this.state.title?.text[this.state.context.lang] != void 0 ? `
+                    <header ${this.getClasses(["modal-card-head"], this.state.title?.classList)}  ${this.setAnimation(this.state.title?.animation)}>
+                        <p class="modal-card-title">${this.state.title.text[this.state.context.lang]}</p>
+                    </header>` : ""}
+                    <section class="modal-card-body">
+                            <div>
+                                <div id="calendar"></div>
+                            </div>
+                            <div class="pt-2">
+                                <div class="fixed-grid has-5-cols">
+                                    <div class="grid">
+                                        ${this.#getTimes()}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="pt-4">
-                            ${this.state?.form != void 0 ? new CjForm(this.state.form, this.state.context).render() : ""}
-                        </div>
-                </section>
+                            <div class="pt-4">
+                                ${this.state?.form != void 0 ? new CjForm(this.state.form, this.state.context).render() : ""}
+                            </div>
+                    </section>
+                </div>
             </div>
-        </div>
-        `;
+            `;
       addFormEvents(this);
       this.registerExtraEvents();
       this.addDateField();

@@ -1,5 +1,7 @@
 # cj-forms
 Forms to generate leads from the Buyer Journey.js project made in javascript with delicious vanilla flavor.
+## CustumerJourney.js
+This library is part of the C[CustumerJourney.js](https://customerjourney.ninja/) project. Vanilla JavaScript libraries optimized for creating sales funnels with hyper-personalized customer experience powered by artificial intelligence.
 ## Components included
 - form-lead:The classic form to collect data
 - form-hero: Hero with two columns, one for the form another for information.
@@ -19,3 +21,5 @@ Forms to generate leads from the Buyer Journey.js project made in javascript wit
 
 ## License
 cj-forms is [GPL-3.0-or-later](./LICENSE).
+## Sponsor
+[Become a CustumerJourney.js Sponsor](https://customerjourney.ninja/sponsor/).

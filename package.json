@@ -1,6 +1,6 @@
 {
   "name": "@customerjourney/cj-forms",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "description": "Macro-components for creating forms",
   "main": "src/index.js",
   "module": "src/index.js",
