@@ -1,3 +1,4 @@
+import { render } from "preact";
 import { AppElement } from "@customerjourney/cj-core";
 import { CjForm, addFormEvents } from "./Form";
 import {isValidPhoneNumber } from "libphonenumber-js";
@@ -5,7 +6,7 @@ import countryCodes from "./countryCodes.json";
 
 export class FormLead extends AppElement {
 
-    
+
     #default = {
         form:{}
     }
@@ -16,7 +17,7 @@ export class FormLead extends AppElement {
         this.state =this.initState(this.#default,props);
         this.getAttribute("id")||this.setAttribute("id",this.state.id||`component-${Math.floor(Math.random() * 100)}`);
         this.ok = false;
-       
+
     }
 
     static get observedAttributes() {
@@ -46,8 +47,8 @@ export class FormLead extends AppElement {
                 this.ok = false;
             }
         }else if (event.type === "change"&&event.target.id==='email'){
-            let regex = /^(?!\.)((?!.*\.{2})[a-zA-Z0-9\u00E0-\u00FC.!#$%&'*+-/=?^_`{|}~\-\d]+)@(?!\.)([a-zA-Z0-9\u00E0-\u00FC\-\.\d]+)((\.([a-zA-Z]){2,63})+)$/;
-            if (regex.test(event.target.value)){ 
+            let regex = /^(?!\.)((?!.*\.{2})[a-zA-Z0-9à-ü.!#$%&'*+-/=?^_`{|}~\-\d]+)@(?!\.)([a-zA-Z0-9à-ü\-\.\d]+)((\.([a-zA-Z]){2,63})+)$/;
+            if (regex.test(event.target.value)){
                 this.querySelector("#help-email").classList.add("is-hidden");
                 this.querySelector("#help2-email").classList.add("is-hidden");
                 this.ok = true;
@@ -131,7 +132,7 @@ export class FormLead extends AppElement {
             }
             if (this.ok===true){
                 if(this.form?.eventName!=undefined){
-                    this.eventName = this.state.form.eventName             
+                    this.eventName = this.state.form.eventName
                   }
                 let data = {}
                 if (leadForm?.contact!=undefined){
@@ -171,26 +172,21 @@ export class FormLead extends AppElement {
         }
     }
 
-    
-
-  
-   
-    
-
     render(){
         this.state?.id!=undefined?this.state.form.id = `${this.state.id}-form`:`form-${Math.floor(Math.random() * 100)}`;
-        this.innerHTML =  /* html */`
-        <section ${this.getClasses(["section"], this.state?.classList)} ${this.setAnimation(this.state.animation)} ${this.getBackground()}>
-            <div class="container py-4">
-                ${this.getTitles()}
-                <div class="columns is-centered">
-                    <div class="column ${this.state?.size!=undefined?this.state.size:'is-4'}">
-                       ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
+        render(
+            <section class={this.getClassNames(["section"], this.state?.classList)} {...this.getAnimationProps(this.state.animation)} style={this.getBackgroundStyle()}>
+                <div class="container py-4">
+                    {this.getTitlesJSX()}
+                    <div class="columns is-centered">
+                        <div class={`column ${this.state?.size!=undefined?this.state.size:'is-4'}`}>
+                            {this.state?.form!=undefined && new CjForm(this.state.form, this.state.context).render()}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        `
+            </section>,
+            this
+        )
         addFormEvents(this);
     }
 

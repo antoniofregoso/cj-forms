@@ -1,3 +1,4 @@
+import { render } from "preact";
 import { FormLead } from "./FormLead";
 import { CjForm, addFormEvents } from "./Form";
 import { Calendar } from 'vanilla-calendar-pro';
@@ -40,6 +41,12 @@ export class FormAppoinment extends FormLead {
     }
 
      attributeChangedCallback(name, oldValue, newValue) {
+        // Guard against this firing before the first render() (e.g. the
+        // constructor's own `setAttribute("stage", "awaiting")`), when none
+        // of these elements exist yet.
+        let form = this.querySelector("form");
+        if (form === null) return;
+
         if (newValue === 'open'){
             if (this.calendar===false){
                 this.calendar = new Calendar('#calendar',this.#setCalendar());
@@ -47,19 +54,18 @@ export class FormAppoinment extends FormLead {
             }else {
                 this.calendar.update();
             }
-            let form = this.querySelector("form");
             const fieldset = form.querySelector('fieldset');
             fieldset.disabled = true;
-            this.querySelector('.modal').classList.add('is-active');            
+            this.querySelector('.modal').classList.add('is-active');
         }else {
-            this.querySelector('form').reset();
+            form.reset();
             let times = this.querySelector('.grid').querySelectorAll('button:not([disabled])');
             times.forEach((time)=>{
                 if (time.classList.contains('is-info')){
                     time.classList.remove('is-info');
                 }
                 time.disabled = true;
-            })          
+            })
 
             this.querySelector('.modal').classList.remove('is-active');
         }
@@ -86,7 +92,7 @@ export class FormAppoinment extends FormLead {
             let yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
-            config.displayDateMin = `${yyyy}-${mm}-${dd}`; 
+            config.displayDateMin = `${yyyy}-${mm}-${dd}`;
         }
         if (this.state.calendar?.deltaDays>0){
             today.setDate(today.getDate() + this.state.calendar.deltaDays -1);
@@ -107,7 +113,7 @@ export class FormAppoinment extends FormLead {
   }
 
     #getTimes(){
-        let times = '';
+        let times = [];
         let deltaTime = this.state.calendar.deltaTime;
         let currentMinutes = this.state.calendar.initialTime * 60;
         const endMinutes = this.state.calendar.finalTime * 60 + deltaTime;
@@ -116,8 +122,12 @@ export class FormAppoinment extends FormLead {
                 const hours = Math.floor(currentMinutes / 60);
                 const minutes = currentMinutes % 60;
                 const timeStr = `${this.#pad(hours)}:${this.#pad(minutes)}`;
+                times.push(
+                    <div class="cell" key={timeStr}>
+                        <button class="button is-small is-time" data-time={timeStr} disabled>{timeStr}</button>
+                    </div>
+                );
             currentMinutes += deltaTime;
-            times += `<div class="cell"><button class="button is-small is-time" data-time="${timeStr}" disabled>${timeStr}</button></div>`
         }
         }else{
             console.warn("finalTime must be greater than initialTime. It is expressed as integers in 24-hour format.")
@@ -146,7 +156,7 @@ export class FormAppoinment extends FormLead {
         })
     }
 
-  
+
 
    registerExtraEvents(){
         this.addEventListener('time-selected', (e) => {
@@ -178,38 +188,38 @@ export class FormAppoinment extends FormLead {
     }
 
     render(){
-        //if (this.state.context!== undefined && this.state.context.lang!=undefined){
             this.state?.id!=undefined?this.state.form.id = `${this.state.id}-form`:`form-${Math.floor(Math.random() * 100)}`;
-            this.innerHTML =  /* html */`
-            <div class="modal">
-                <div class="modal-background"></div>
-                <div class="modal-card">
-                    ${this.state.title?.text[this.state.context.lang]!=undefined?`
-                    <header ${this.getClasses(["modal-card-head"], this.state.title?.classList)}  ${this.setAnimation(this.state.title?.animation)}>
-                        <p class="modal-card-title">${this.state.title.text[this.state.context.lang]}</p>
-                    </header>`:''}
-                    <section class="modal-card-body">
-                            <div>
-                                <div id="calendar"></div>
-                            </div>
-                            <div class="pt-2">
-                                <div class="fixed-grid has-5-cols">
-                                    <div class="grid">
-                                        ${this.#getTimes()}
+            render(
+                <div class="modal">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        {this.state.title?.text[this.state.context.lang]!=undefined &&
+                            <header class={this.getClassNames(["modal-card-head"], this.state.title?.classList)} {...this.getAnimationProps(this.state.title?.animation)}>
+                                <p class="modal-card-title">{this.state.title.text[this.state.context.lang]}</p>
+                            </header>
+                        }
+                        <section class="modal-card-body">
+                                <div>
+                                    <div id="calendar"></div>
+                                </div>
+                                <div class="pt-2">
+                                    <div class="fixed-grid has-5-cols">
+                                        <div class="grid">
+                                            {this.#getTimes()}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="pt-4">
-                                ${this.state?.form!=undefined?new CjForm(this.state.form, this.state.context).render():''}
-                            </div>
-                    </section>
-                </div>
-            </div>
-            `
+                                <div class="pt-4">
+                                    {this.state?.form!=undefined && new CjForm(this.state.form, this.state.context).render()}
+                                </div>
+                        </section>
+                    </div>
+                </div>,
+                this
+            )
             addFormEvents(this);
             this.registerExtraEvents();
             this.addDateField()
-            //}
     }
 
 }

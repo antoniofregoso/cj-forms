@@ -1,0 +1,45 @@
+import { render } from "preact";
+import { FormLead } from "./FormLead";
+import { CjForm, addFormEvents } from "./Form";
+
+export class FormModal extends FormLead {
+
+    #default = {
+        eventName:"user:click-form-modal",
+        form:{}
+    }
+
+    constructor(props={}){
+        super();
+        this.eventName = "user:click-form-modal";
+        this.state =this.initState(this.#default,props);
+        this.getAttribute("id")||this.setAttribute("id",this.state.id||`component-${Math.floor(Math.random() * 100)}`);
+        this.setAttribute("stage","awaiting")
+        this.ok = false;
+
+    }
+
+    render(){
+        this.state?.id!=undefined?this.state.form.id = `${this.state.id}-form`:`form-${Math.floor(Math.random() * 100)}`;
+        render(
+            <div class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    {this.state.title?.text[this.state.context.lang]!=undefined &&
+                        <header class={this.getClassNames(["modal-card-head"], this.state.title?.classList)} {...this.getAnimationProps(this.state.title?.animation)}>
+                            <p class="modal-card-title">{this.state.title.text[this.state.context.lang]}</p>
+                        </header>
+                    }
+                    <section class="modal-card-body">
+                        {this.state?.form!=undefined && new CjForm(this.state.form, this.state.context).render()}
+                    </section>
+                </div>
+            </div>,
+            this
+        )
+        addFormEvents(this);
+    }
+
+}
+
+customElements.define("form-modal", FormModal);
