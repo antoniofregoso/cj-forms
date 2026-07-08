@@ -1,6 +1,6 @@
 {
   "name": "@customerjourney/cj-forms",
-  "version": "0.10.5",
+  "version": "1.0.0",
   "description": "Macro-components for creating forms",
   "type": "module",
   "main": "dist/index.js",
@@ -39,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/antoniofregoso/cj-forms/issues"
   },
-  "homepage": "https://customerjourney.ninja/documentation/forms/",
+  "homepage": "https://antoniofregoso.github.io/customerjourney/documentation/forms/",
   "keywords": [
     "vanilla-javascript",
     "components",
